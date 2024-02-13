@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1"
+    />
+    <title>Caloriego</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Caloriego</h2>
+      <label for="itemName">Item Name:</label>
+      <input type="text" id="itemName" placeholder="Enter item name" required />
+
+      <label for="itemServingSize">Serving Size:</label>
+      <input
+        type="tel"
+        id="itemServingSize"
+        placeholder="Enter serving size"
+        required
+      />
+
+      <label for="itemCaloriesPerServing">Calories per Serving:</label>
+      <input
+        type="tel"
+        id="itemCaloriesPerServing"
+        placeholder="Enter calories per serving"
+        required
+      />
+
+      <label for="itemFat">Fat (g):</label>
+      <input
+        type="tel"
+        id="itemFat"
+        placeholder="Enter fat content per serving"
+        required
+      />
+
+      <label for="itemCarbs">Carbohydrates (g):</label>
+      <input
+        type="tel"
+        id="itemCarbs"
+        placeholder="Enter carbohydrate content per serving"
+        required
+      />
+
+      <label for="itemFiber">Fiber (g):</label>
+      <input
+        type="tel"
+        id="itemFiber"
+        placeholder="Enter fiber content per serving"
+        required
+      />
+
+      <label for="itemProtein">Protein (g):</label>
+      <input
+        type="tel"
+        id="itemProtein"
+        placeholder="Enter protein content per serving"
+        required
+      />
+
+      <label for="myServing">My Serving Size:</label>
+      <input
+        type="tel"
+        id="myServing"
+        placeholder="Enter your serving size"
+        required
+      />
+
+      <div class="button-container">
+        <button id="addButton" onclick="addItem()">Add</button>
+        <button id="generateButton">Image</button>
+        <button id="resetButton" onclick="resetItemsAndCookies()">Reset</button>
+      </div>
+
+      <label for="recipeName">Recipe Name:</label>
+      <input
+        type="text"
+        id="recipeName"
+        placeholder="Enter recipe name"
+        required
+      />
+
+      <div id="recipe-content">
+        <div id="items-list">
+          <h2 id="recipeHeading">Items Added:</h2>
+          <ul id="items"></ul>
+        </div>
+
+        <div id="totals">
+          <div id="total-calories"></div>
+          <div id="total-fat"></div>
+          <div id="total-carbs"></div>
+          <div id="total-fiber"></div>
+          <div id="total-protein"></div>
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+      integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="script.js"></script>
+  </body>
+</html>
