@@ -5,6 +5,16 @@ document.addEventListener("DOMContentLoaded", function () {
   loadItemsFromCookies();
 });
 
+// Add event listeners to input fields
+document.querySelectorAll("input").forEach(function (input) {
+  input.addEventListener("input", function () {
+    if (input.classList.contains("numeric")) {
+      // Replace non-numeric characters with empty string
+      input.value = input.value.replace(/[^0-9.]/g, "");
+    }
+  });
+});
+
 // Add item on Enter key press
 document.addEventListener("keydown", function (event) {
   if (event.key === "Enter") {
@@ -19,22 +29,45 @@ document.getElementById("recipeName").addEventListener("input", function () {
     recipeName !== "" ? recipeName + ":" : "Items Added:";
 });
 
-document
-  .getElementById("generateButton")
-  .addEventListener("click", function () {
-    html2canvas(document.getElementById("recipe-content")).then(function (
-      canvas
-    ) {
-      var recipeName = document.getElementById("recipeHeading").innerText;
+// Function to capture the screenshot
+function captureScreenshot() {
+  // Hide delete buttons before capturing the screenshot
+  var deleteButtons = document.querySelectorAll(".delete-btn");
+  deleteButtons.forEach(function (button) {
+    button.style.display = "none";
+  });
+
+  // Capture the screenshot
+  html2canvas(document.getElementById("recipe-content"), { scale: 2 }).then(
+    function (canvas) {
+      // Restore visibility of delete buttons after capturing the screenshot
+      deleteButtons.forEach(function (button) {
+        button.style.display = "block";
+      });
+
+      // Get the recipe name for the filename
+      var recipeName = document.getElementById("recipeName").value.trim();
+      if (!recipeName) {
+        recipeName = "Recipe";
+      }
+
       // Convert the canvas to an image data URL
       var imgData = canvas.toDataURL("image/png");
 
       // Create a link element to download the image
       var downloadLink = document.createElement("a");
       downloadLink.href = imgData;
-      downloadLink.download = recipeName.slice(0, -1) + ".png";
+      downloadLink.download = recipeName + ".png";
       downloadLink.click();
-    });
+    }
+  );
+}
+
+// Add event listener to the generate button
+document
+  .getElementById("generateButton")
+  .addEventListener("click", function () {
+    captureScreenshot();
   });
 
 // Function to save items to cookies
@@ -57,6 +90,7 @@ function loadItemsFromCookies() {
 function resetItemsAndCookies() {
   items = [];
   displayItems();
+  calculateTotal();
   eraseCookie("calorieItems");
   document.getElementById("recipeName").value = "";
   document.getElementById("recipeHeading").innerText = "Items Added";
@@ -166,9 +200,11 @@ function displayItems() {
   var itemsList = document.getElementById("items");
   itemsList.innerHTML = "";
   items.forEach(function (item, index) {
-    console.log(item);
     var li = document.createElement("li");
     li.textContent =
+      index +
+      1 +
+      ". " + // Add numbering
       item.name +
       ": " +
       "Calories: " +
