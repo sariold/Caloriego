@@ -1,156 +1,150 @@
-var items = [];
+let items = [];
+let isScanning = false; // Track scanner state
 
-// Add event listener to load items from cookies when the DOM content is fully loaded
-document.addEventListener("DOMContentLoaded", function () {
+// Load items from cookies when DOM is ready
+document.addEventListener("DOMContentLoaded", () => {
   loadItemsFromCookies();
+  showScannerPreview(false);
 });
 
-// Add event listeners to input fields
-document.querySelectorAll("input").forEach(function (input) {
-  input.addEventListener("input", function () {
-    if (input.classList.contains("numeric")) {
-      // Replace non-numeric characters with empty string
-      input.value = input.value.replace(/[^0-9.]/g, "");
-    }
+// Sanitize numeric inputs to allow only numbers and decimals
+document.querySelectorAll("input.numeric").forEach((input) => {
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/[^0-9.]/g, "");
   });
 });
 
-// Add item on Enter key press
-document.addEventListener("keydown", function (event) {
-  if (event.key === "Enter") {
+// Add item when Enter key is pressed anywhere (except when scanning)
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !isScanning) {
     addItem();
   }
 });
 
-// Add event listener to update the heading text based on recipeName input
+// Update heading dynamically based on recipe name input
 document.getElementById("recipeName").addEventListener("input", function () {
-  var recipeName = document.getElementById("recipeName").value;
-  document.getElementById("recipeHeading").innerText =
-    recipeName !== "" ? recipeName + ":" : "Items Added:";
+  const recipeName = this.value.trim();
+  document.getElementById("recipeHeading").innerText = recipeName
+    ? `${recipeName}:`
+    : "Items Added:";
 });
 
-// Function to capture the screenshot
+// Capture screenshot of recipe-content using html2canvas
 function captureScreenshot() {
-  // Hide delete buttons before capturing the screenshot
-  var deleteButtons = document.querySelectorAll(".delete-btn");
-  deleteButtons.forEach(function (button) {
-    button.style.display = "none";
-  });
+  // Hide delete buttons to keep image clean
+  const deleteButtons = document.querySelectorAll(".delete-btn");
+  deleteButtons.forEach((btn) => (btn.style.display = "none"));
 
-  // Capture the screenshot
   html2canvas(document.getElementById("recipe-content"), { scale: 2 }).then(
-    function (canvas) {
-      // Restore visibility of delete buttons after capturing the screenshot
-      deleteButtons.forEach(function (button) {
-        button.style.display = "block";
-      });
+    (canvas) => {
+      // Restore delete buttons visibility
+      deleteButtons.forEach((btn) => (btn.style.display = "block"));
 
-      // Get the recipe name for the filename
-      var recipeName = document.getElementById("recipeName").value.trim();
-      if (!recipeName) {
-        recipeName = "Recipe";
-      }
+      const recipeName =
+        document.getElementById("recipeName").value.trim() || "Recipe";
+      const imgData = canvas.toDataURL("image/png");
 
-      // Convert the canvas to an image data URL
-      var imgData = canvas.toDataURL("image/png");
-
-      // Create a link element to download the image
-      var downloadLink = document.createElement("a");
-      downloadLink.href = imgData;
-      downloadLink.download = recipeName + ".png";
-      downloadLink.click();
+      const link = document.createElement("a");
+      link.href = imgData;
+      link.download = `${recipeName}.png`;
+      link.click();
     }
   );
 }
 
-// Add event listener to the generate button
+// Bind screenshot button
 document
   .getElementById("generateButton")
-  .addEventListener("click", function () {
-    captureScreenshot();
-  });
+  .addEventListener("click", captureScreenshot);
 
-// Function to save items to cookies
-function saveItemsToCookies() {
-  var itemsJSON = JSON.stringify(items);
-  setCookie("calorieItems", itemsJSON, 7); // Expires in 7 days
+// Cookie helpers
+function setCookie(name, value, days) {
+  let expires = "";
+  if (days) {
+    const d = new Date();
+    d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
+    expires = "; expires=" + d.toUTCString();
+  }
+  document.cookie = `${name}=${value || ""}${expires}; path=/`;
 }
 
-// Function to load items from cookies
-function loadItemsFromCookies() {
-  var itemsJSON = getCookie("calorieItems");
-  if (itemsJSON) {
-    items = JSON.parse(itemsJSON);
-    displayItems();
+function getCookie(name) {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(";");
+  for (let c of ca) {
+    c = c.trim();
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
   }
+  return null;
+}
+
+function eraseCookie(name) {
+  document.cookie = `${name}=; Max-Age=-99999999;`;
+}
+
+// Save current items array to cookies
+function saveItemsToCookies() {
+  setCookie("calorieItems", JSON.stringify(items), 7);
+}
+
+// Load items from cookies and display
+function loadItemsFromCookies() {
+  const itemsJSON = getCookie("calorieItems");
+  if (itemsJSON) {
+    try {
+      items = JSON.parse(itemsJSON);
+    } catch {
+      items = [];
+    }
+  }
+  displayItems();
   calculateTotal();
 }
 
-// Function to reset items and clear cookies
+// Reset app state & clear cookies
 function resetItemsAndCookies() {
   items = [];
   displayItems();
   calculateTotal();
   eraseCookie("calorieItems");
   document.getElementById("recipeName").value = "";
-  document.getElementById("recipeHeading").innerText = "Items Added";
+  document.getElementById("recipeHeading").innerText = "Items Added:";
 }
 
-// Function to set a cookie
-function setCookie(name, value, days) {
-  var expires = "";
-  if (days) {
-    var date = new Date();
-    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-    expires = "; expires=" + date.toUTCString();
-  }
-  document.cookie = name + "=" + (value || "") + expires + "; path=/";
-}
-
-// Function to get a cookie value
-function getCookie(name) {
-  var nameEQ = name + "=";
-  var ca = document.cookie.split(";");
-  for (var i = 0; i < ca.length; i++) {
-    var c = ca[i];
-    while (c.charAt(0) == " ") c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-  }
-  return null;
-}
-
-// Function to erase a cookie
-function eraseCookie(name) {
-  document.cookie = name + "=; Max-Age=-99999999;";
-}
-
+// Add a new item based on input values
 function addItem() {
-  var itemName = document.getElementById("itemName").value;
-  var itemServingSize = parseFloat(
-    document.getElementById("itemServingSize").value.replace(",", ".")
-  );
-  var itemCaloriesPerServing = parseFloat(
+  const itemName = document.getElementById("itemName").value.trim();
+  const itemServingSizeStr = document
+    .getElementById("itemServingSize")
+    .value.trim();
+  const itemCaloriesPerServing = parseFloat(
     document.getElementById("itemCaloriesPerServing").value.replace(",", ".")
   );
-  var itemFat = parseFloat(
+  const itemFat = parseFloat(
     document.getElementById("itemFat").value.replace(",", ".")
   );
-  var itemCarbs = parseFloat(
+  const itemCarbs = parseFloat(
     document.getElementById("itemCarbs").value.replace(",", ".")
   );
-  var itemFiber = parseFloat(
+  const itemFiber = parseFloat(
     document.getElementById("itemFiber").value.replace(",", ".")
   );
-  var itemProtein = parseFloat(
+  const itemProtein = parseFloat(
     document.getElementById("itemProtein").value.replace(",", ".")
   );
-  var myServing = parseFloat(
+  const myServing = parseFloat(
     document.getElementById("myServing").value.replace(",", ".")
   );
 
-  // Check if all fields are filled
+  // Extract numeric serving size from string
+  const servingSizeMatch = itemServingSizeStr.match(/([\d.,]+)/);
+  const itemServingSize = servingSizeMatch
+    ? parseFloat(servingSizeMatch[1].replace(",", "."))
+    : NaN;
+
+  // Validate inputs
   if (
-    itemName.trim() === "" ||
+    !itemName ||
     isNaN(itemServingSize) ||
     isNaN(itemCaloriesPerServing) ||
     isNaN(itemFat) ||
@@ -163,79 +157,69 @@ function addItem() {
     return;
   }
 
-  var calculatedCalories =
-    (myServing / itemServingSize) * itemCaloriesPerServing;
-  var calculatedFat = (myServing / itemServingSize) * itemFat;
-  var calculatedCarbs = (myServing / itemServingSize) * itemCarbs;
-  var calculatedFiber = (myServing / itemServingSize) * itemFiber;
-  var calculatedProtein = (myServing / itemServingSize) * itemProtein;
+  // Scale nutrient values based on serving size
+  function scale(value) {
+    return (myServing / itemServingSize) * value;
+  }
 
   items.push({
     name: itemName,
-    calories: calculatedCalories,
-    fat: calculatedFat,
-    carbs: calculatedCarbs,
-    fiber: calculatedFiber,
-    protein: calculatedProtein,
+    calories: scale(itemCaloriesPerServing),
+    fat: scale(itemFat),
+    carbs: scale(itemCarbs),
+    fiber: scale(itemFiber),
+    protein: scale(itemProtein),
   });
 
   displayItems();
   calculateTotal();
-
-  // Clear input fields
-  document.getElementById("recipeName").value = "";
-  document.getElementById("itemName").value = "";
-  document.getElementById("itemServingSize").value = "";
-  document.getElementById("itemCaloriesPerServing").value = "";
-  document.getElementById("itemFat").value = "";
-  document.getElementById("itemCarbs").value = "";
-  document.getElementById("itemFiber").value = "";
-  document.getElementById("itemProtein").value = "";
-  document.getElementById("myServing").value = "";
-
   saveItemsToCookies();
+
+  // Clear input fields except recipeName
+  [
+    "itemName",
+    "itemServingSize",
+    "itemCaloriesPerServing",
+    "itemFat",
+    "itemCarbs",
+    "itemFiber",
+    "itemProtein",
+    "myServing",
+  ].forEach((id) => {
+    document.getElementById(id).value = "";
+  });
 }
 
+// Display all items with delete buttons
 function displayItems() {
-  var itemsList = document.getElementById("items");
+  const itemsList = document.getElementById("items");
   itemsList.innerHTML = "";
-  items.forEach(function (item, index) {
-    var li = document.createElement("li");
-    li.textContent =
-      index +
-      1 +
-      ". " + // Add numbering
-      item.name +
-      ": " +
-      "Calories: " +
-      item.calories.toFixed(2) +
-      ", " +
-      "Fat: " +
-      item.fat.toFixed(2) +
-      "g, " +
-      "Carbs: " +
-      item.carbs.toFixed(2) +
-      "g, " +
-      "Fiber: " +
-      item.fiber.toFixed(2) +
-      "g, " +
-      "Protein: " +
-      item.protein.toFixed(2) +
-      "g ";
-    var deleteButton = document.createElement("button");
-    deleteButton.textContent = "Delete";
-    deleteButton.className = "delete-btn";
-    deleteButton.onclick = function () {
-      deleteItem(index);
-    };
-    var deleteButtonContainer = document.createElement("div");
-    deleteButtonContainer.className = "delete-btn-container";
-    deleteButtonContainer.appendChild(deleteButton);
-    li.appendChild(deleteButtonContainer);
+  items.forEach((item, index) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <strong>${index + 1}. ${item.name}:</strong>
+      Calories: ${item.calories.toFixed(2)},
+      Fat: ${item.fat.toFixed(2)}g,
+      Carbs: ${item.carbs.toFixed(2)}g,
+      Fiber: ${item.fiber.toFixed(2)}g,
+      Protein: ${item.protein.toFixed(2)}g
+    `;
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+    deleteBtn.className = "delete-btn";
+    deleteBtn.onclick = () => deleteItem(index);
+
+    const btnContainer = document.createElement("div");
+    btnContainer.className = "delete-btn-container";
+    btnContainer.appendChild(deleteBtn);
+
+    li.appendChild(btnContainer);
     itemsList.appendChild(li);
   });
 }
 
+// Delete item at given index
 function deleteItem(index) {
   items.splice(index, 1);
   displayItems();
@@ -243,29 +227,132 @@ function deleteItem(index) {
   saveItemsToCookies();
 }
 
+// Calculate and display totals
 function calculateTotal() {
-  var totalCalories = 0;
-  var totalFat = 0;
-  var totalCarbs = 0;
-  var totalFiber = 0;
-  var totalProtein = 0;
+  const totals = items.reduce(
+    (acc, item) => {
+      acc.calories += item.calories;
+      acc.fat += item.fat;
+      acc.carbs += item.carbs;
+      acc.fiber += item.fiber;
+      acc.protein += item.protein;
+      return acc;
+    },
+    { calories: 0, fat: 0, carbs: 0, fiber: 0, protein: 0 }
+  );
 
-  items.forEach(function (item) {
-    totalCalories += item.calories;
-    totalFat += item.fat;
-    totalCarbs += item.carbs;
-    totalFiber += item.fiber;
-    totalProtein += item.protein;
+  document.getElementById(
+    "total-calories"
+  ).innerText = `Total Calories: ${totals.calories.toFixed(2)}`;
+  document.getElementById(
+    "total-fat"
+  ).innerText = `Total Fat: ${totals.fat.toFixed(2)}g`;
+  document.getElementById(
+    "total-carbs"
+  ).innerText = `Total Carbs: ${totals.carbs.toFixed(2)}g`;
+  document.getElementById(
+    "total-fiber"
+  ).innerText = `Total Fiber: ${totals.fiber.toFixed(2)}g`;
+  document.getElementById(
+    "total-protein"
+  ).innerText = `Total Protein: ${totals.protein.toFixed(2)}g`;
+}
+
+// Barcode scanner setup with QuaggaJS
+const startScanBtn = document.getElementById("start-scan");
+const stopScanBtn = document.getElementById("stop-scan");
+
+startScanBtn.addEventListener("click", () => {
+  if (isScanning) return;
+
+  showScannerPreview(true);
+
+  Quagga.init(
+    {
+      inputStream: {
+        type: "LiveStream",
+        target: document.querySelector("#scanner-preview"),
+        constraints: { facingMode: "environment" },
+      },
+      decoder: {
+        readers: ["ean_reader"], // UPC/EAN codes
+      },
+      locate: true,
+    },
+    (err) => {
+      if (err) {
+        console.error("Quagga init error:", err);
+        alert("Error initializing barcode scanner: " + err.message);
+        showScannerPreview(false); // Hide preview if error
+        return;
+      }
+      Quagga.start();
+      isScanning = true;
+      startScanBtn.disabled = true;
+      stopScanBtn.disabled = false;
+    }
+  );
+
+  Quagga.onDetected((result) => {
+    if (!result || !result.codeResult || !result.codeResult.code) return;
+
+    const code = result.codeResult.code;
+    console.log("Barcode detected:", code);
+    stopScanner();
+    fetchNutritionData(code);
   });
+});
 
-  document.getElementById("total-calories").innerText =
-    "Total Calories: " + totalCalories.toFixed(2);
-  document.getElementById("total-fat").innerText =
-    "Total Fat: " + totalFat.toFixed(2) + "g";
-  document.getElementById("total-carbs").innerText =
-    "Total Carbs: " + totalCarbs.toFixed(2) + "g";
-  document.getElementById("total-fiber").innerText =
-    "Total Fiber: " + totalFiber.toFixed(2) + "g";
-  document.getElementById("total-protein").innerText =
-    "Total Protein: " + totalProtein.toFixed(2) + "g";
+// Stop scanner function
+function stopScanner() {
+  if (isScanning) {
+    Quagga.stop();
+    isScanning = false;
+    startScanBtn.disabled = false;
+    stopScanBtn.disabled = true;
+    showScannerPreview(false);
+  }
+}
+
+// Stop scan button event
+stopScanBtn.addEventListener("click", stopScanner);
+
+function showScannerPreview(show) {
+  const preview = document.getElementById("scanner-preview");
+  preview.style.display = show ? "block" : "none";
+}
+
+// Fetch nutrition data from Open Food Facts API and autofill form
+async function fetchNutritionData(barcode) {
+  try {
+    const res = await fetch(
+      `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
+    );
+    const data = await res.json();
+
+    if (data.status === 1) {
+      const product = data.product;
+      const nutriments = product.nutriments || {};
+
+      const getValue = (nutrient) => {
+        return nutriments[nutrient] !== undefined ? nutriments[nutrient] : "";
+      };
+
+      // Autofill inputs directly with raw values
+      document.getElementById("itemName").value = product.product_name || "";
+      document.getElementById("itemServingSize").value =
+        product.serving_size || "";
+      document.getElementById("itemCaloriesPerServing").value =
+        getValue("energy-kcal");
+      document.getElementById("itemFat").value = getValue("fat");
+      document.getElementById("itemCarbs").value = getValue("carbohydrates");
+      document.getElementById("itemFiber").value = getValue("fiber");
+      document.getElementById("itemProtein").value = getValue("proteins");
+    } else {
+      alert("Product not found in Open Food Facts.");
+    }
+  } catch (error) {
+    console.error("Error fetching nutrition info:", error);
+    alert("Failed to fetch product information.");
+  }
 }

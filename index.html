@@ -14,6 +14,13 @@
   <body>
     <div class="container">
       <h2>Caloriego</h2>
+
+      <div id="barcode-scanner-container">
+        <button id="start-scan">Scan Barcode</button>
+        <button id="stop-scan" disabled>Stop Scan</button>
+        <div id="scanner-preview"></div>
+      </div>
+
       <label for="itemName">Item Name:</label>
       <input
         type="text"
@@ -115,6 +122,8 @@
         </div>
       </div>
     </div>
+
+    <script src="https://unpkg.com/@ericblade/quagga2@1.2.6/dist/quagga.min.js"></script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
       integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
