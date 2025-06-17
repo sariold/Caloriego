@@ -256,27 +256,36 @@ li:last-child {
 
 .footer {
   margin-top: 40px;
-  padding-top: 16px;
-  border-top: 1px solid #e0e0e0;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
   text-align: center;
   font-size: 14px;
-  color: #444;
+  color: #6b7280;
 }
 
-.footer a {
+.footerLink {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   text-decoration: none;
   color: inherit;
+  font-weight: 500;
   transition: color 0.2s ease;
 }
 
-.github-icon {
+.footerLink:hover {
+  color: #111827;
+}
+
+.githubIcon {
   width: 20px;
   height: 20px;
   filter: grayscale(100%);
   transition: filter 0.2s ease;
+}
+
+.footerLink:hover .githubIcon {
+  filter: none;
 }
 
 @media (max-width: 640px) {
