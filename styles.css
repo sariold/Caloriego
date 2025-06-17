@@ -254,6 +254,31 @@ li:last-child {
   box-shadow: 0 6px 14px rgba(167, 29, 42, 0.6);
 }
 
+.footer {
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+  text-align: center;
+  font-size: 14px;
+  color: #444;
+}
+
+.footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+.github-icon {
+  width: 20px;
+  height: 20px;
+  filter: grayscale(100%);
+  transition: filter 0.2s ease;
+}
+
 @media (max-width: 640px) {
   .container {
     width: 90%;
