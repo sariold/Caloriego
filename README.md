@@ -1,40 +1,51 @@
-# Caloriego
+# 🥑 Caloriego
 
-**Caloriego** is a mobile-friendly web app that helps you track nutrition information by scanning barcodes or manually entering food item details. You can build custom recipes by adding multiple items and see their combined nutrition totals.
+**Caloriego** is a sleek, mobile-friendly web app built to help you **track your nutrition** by scanning barcodes or entering food info manually. 🧾 Create recipes, calculate totals, and even generate a shareable image of your meal's nutrition!
 
-## Features
+---
 
-- Barcode scanning powered by QuaggaJS for quick item entry
-- Manual input for item name, serving size, calories, fat, carbs, fiber, and protein
-- Adjustable personal serving size for customized tracking
-- Add multiple items to create a recipe and view combined nutrition facts
-- Generate an image summary of your recipe (using html2canvas)
-- Reset option to clear all entered data
+## 🚀 Features
 
-## Getting Started
+- 📷 **Scan Barcodes** using your camera with **QuaggaJS**
+- ✍️ **Manual Entry** for food name, serving size, calories, fat, carbs, fiber, and protein
+- ⚖️ **Custom Serving Sizes** to track your exact intake
+- 🧩 **Recipe Builder** – combine multiple items into one custom recipe
+- 🧮 **Auto Totals** for calories, macros, and fiber
+- 🖼️ **Generate Summary Image** with **html2canvas**
+- ♻️ **Reset Button** to start fresh at any time
 
-### Prerequisites
+---
 
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- Webcam (for barcode scanning functionality)
+## 📦 Getting Started
 
-### Installation
+### ✅ Requirements
+
+- A modern browser (Chrome, Firefox, Safari, Edge)
+- Webcam access for barcode scanning 📸
+
+### 🛠️ Installation
 
 1. Clone or download this repository
-2. Open `index.html` in your web browser
+2. Open `index.html` directly in your browser
 
-### Usage
+### 🧪 Usage
 
-- Click **Scan Barcode** to start scanning barcodes of food items
-- Fill in or adjust nutrition information fields
-- Enter your serving size
-- Click **Add** to add the item to your recipe list
-- View totals for calories, fat, carbs, fiber, and protein
-- Use **Image** button to generate a snapshot of your recipe
-- Use **Reset** to clear all data and start fresh
+1. Tap **Scan Barcode** to use your camera and auto-fill nutrition info
+2. Fill in missing details or adjust as needed
+3. Add a serving size that reflects your portion
+4. Click **Add** to include the item in your recipe
+5. View total nutrition for all added items
+6. Click **Image** to generate a nutrition summary snapshot
+7. Use **Reset** to clear the list and start over
 
-## Technologies Used
+---
 
-- [QuaggaJS](https://github.com/serratus/quaggaJS) — barcode scanning library
-- [html2canvas](https://html2canvas.hertzen.com/) — for generating images from DOM elements
-- HTML5, CSS3, and vanilla JavaScript
+## 🔧 Built With
+
+- 📦 [QuaggaJS](https://github.com/serratus/quaggaJS) – barcode scanning from your webcam
+- 🖼️ [html2canvas](https://html2canvas.hertzen.com/) – generate screenshots of the recipe summary
+- 🧱 HTML5 + 🎨 CSS3 + 🧠 JavaScript (vanilla, no frameworks)
+
+---
+
+**Track smarter. Eat better. Anywhere.** 🌎🍴
